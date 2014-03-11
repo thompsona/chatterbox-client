@@ -6,6 +6,10 @@ $(function(){
   var selectedRoom;
   var msg = {};
   var friends = {};
+  var msgString = "<p><a class='chatUsername' href='#' data-name='{{username}}'>{{friendName}}</a>: {{message}} @ {{timestamp}} room: {{roomname}}</p>";
+  var rmSeclectString = "<option>{{roomname}}</option>"
+  var friendString = "<b>{{username}}</b>"
+
 
   $("#sendBT").click(function() {
     msg.text = $("#toSend").val() || "";
@@ -83,7 +87,7 @@ $(function(){
       contentType: 'application/json',
       data: {order: '-createdAt'},
       success: function (data) {
-       console.log(data);
+      // console.log(data);
         parseMsg(data);
         getRooms(data);
         //console.log('chatterbox: Message received');
@@ -99,17 +103,17 @@ $(function(){
     stringHtml = "";
     selectedRoom = $("#roomSelect").val();
     for (var i = 0; i < data.results.length; i++) {
-      var textFormat = "";
+      var friendName = "";
       if(!isScript(data.results[i].text) && !isScript(data.results[i].username) && !isScript(data.results[i].roomname)){
         if(data.results[i].roomname === selectedRoom) {
           var timestamp = $.prettyDate.format(data.results[i].createdAt);
           if(friends[username] !== undefined && friends[username].indexOf(data.results[i].username) !== -1) {
-            textFormat = "<b>" + data.results[i].username + "</b>";
+            friendName = makeTemplate(friendString, {username: data.results[i].username});
           }
           else {
-            textFormat = data.results[i].username;
+            friendName = data.results[i].username;
           }
-          stringHtml = stringHtml.concat("<p><a class='chatUsername' href='#' data-name='"+data.results[i].username+"'>"+textFormat+"</a>: "+data.results[i].text+" @" +timestamp+ " room: " + data.results[i].roomname + "</p>");
+          stringHtml = stringHtml.concat(makeTemplate(msgString, {username: data.results[i].username, friendName: friendName, timestamp: timestamp, roomname: data.results[i].roomname, message: data.results[i].text}));
         }
       }
     };
@@ -120,7 +124,7 @@ $(function(){
     for (var i = 0; i < data.results.length; i++) {
       if(!isScript(data.results[i].roomname) && rooms[data.results[i].roomname] === undefined) {
         rooms[data.results[i].roomname] = true;
-        $("#roomSelect").append("<option>" + data.results[i].roomname + "</option>");
+        $("#roomSelect").append(makeTemplate(rmSeclectString, {roomname: data.results[i].roomname}));
       }
     }
   };
