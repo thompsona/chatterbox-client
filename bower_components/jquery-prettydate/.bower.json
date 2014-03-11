@@ -1,0 +1,15 @@
+{
+  "name": "jquery-prettydate",
+  "homepage": "https://github.com/jzaefferer/jquery-prettydate",
+  "version": "1.1.3",
+  "_release": "1.1.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.1.3",
+    "commit": "6e56efcd7838794c5caa5c0ec6f6a66b3bd6f687"
+  },
+  "_source": "git://github.com/jzaefferer/jquery-prettydate.git",
+  "_target": "~1.1.3",
+  "_originalSource": "jquery-prettydate",
+  "_direct": true
+}

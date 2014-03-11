@@ -6,15 +6,32 @@
     <link rel="stylesheet" href="styles/styles.css">
 
     <!-- dependencies -->
-    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="../bower_components/jquery/jquery.min.js"></script>
+    <script src="../bower_components/underscore/underscore.js"></script>
+    <script src="../bower_components/jquery-prettydate/jquery.prettydate.js"></script>
     <!-- your scripts -->
     <script src="scripts/config.js"></script>
     <script src="scripts/app.js"></script>
   </head>
   <body>
     <div id="main">
-      <h1>chatterbox</h1>
+      <div>
+        <h1 style="display: inline">chatterbox</h1>
+        
+        <input size="10" id='username'></input>
+        <button style="width:70px;" id='usernameBT'>select username</button>
+         <input size="10" id='roomname'></input>
+        <button style="width:70px;" id='roomnameBT'>select roomname</button>
+        <button id="refreshMsgs">refresh</button>
+      </div>
       <!-- Your HTML goes here! -->
+      <div>
+        <select id="roomSelect"></select>
+        <input id="toSend" type="text"></input>
+        <button id="sendBT">send</button>
+      </div>
+      <div id="chatArea"></div>
     </div>
+
   </body>
 </html>
