@@ -1,11 +1,12 @@
 $(function(){
-
+  
   var stringHtml = "";
   var username = null;
   var rooms = {};
   var selectedRoom;
-  var msg = {};
+  var msg = {userphoto: ""};
   var friends = {};
+  var msgPhotoString = "<p>{{userphoto}}<a class='chatUsername' href='#' data-name='{{username}}'>{{friendName}}</a>: {{message}} @ {{timestamp}} room: {{roomname}}</p>";
   var msgString = "<p><a class='chatUsername' href='#' data-name='{{username}}'>{{friendName}}</a>: {{message}} @ {{timestamp}} room: {{roomname}}</p>";
   var rmSeclectString = "<option>{{roomname}}</option>"
   var friendString = "<b>{{username}}</b>"
@@ -20,6 +21,15 @@ $(function(){
       msg.username = username;
       msg.roomname = selectedRoom;
       postMsg(msg);
+    }
+  });
+
+  $("#userphotoBT").click(function() {
+    msg.userphoto = $("#userphoto").val() || "";
+    if(msg.userphoto === "" || msg.userphoto === undefined) {
+      alert('please enter a url for your photo');
+    }else{
+      msg.userphoto = makeTemplate("<img src='{{userphoto}}' style='height:30px; width:40px;'/>", {userphoto: $("#userphoto").val()});
     }
   });
 
@@ -41,7 +51,6 @@ $(function(){
       msg.text = $("#toSend").val() || "";
       msg.username = username;
       msg.roomname = newRoom;
-      msg.friend = "yea";
       postMsg(msg);
     }
   });
@@ -113,7 +122,12 @@ $(function(){
           else {
             friendName = data.results[i].username;
           }
-          stringHtml = stringHtml.concat(makeTemplate(msgString, {username: data.results[i].username, friendName: friendName, timestamp: timestamp, roomname: data.results[i].roomname, message: data.results[i].text}));
+          if(friendName === username) {
+            stringHtml = stringHtml.concat(makeTemplate(msgPhotoString, {userphoto: msg.userphoto, username: data.results[i].username, friendName: friendName, timestamp: timestamp, roomname: data.results[i].roomname, message: data.results[i].text}));
+          }
+          else {
+            stringHtml = stringHtml.concat(makeTemplate(msgString, {username: data.results[i].username, friendName: friendName, timestamp: timestamp, roomname: data.results[i].roomname, message: data.results[i].text}));
+          }
         }
       }
     };
