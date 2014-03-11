@@ -4,10 +4,11 @@ $(function(){
   var username = null;
   var rooms = {};
   var selectedRoom;
+  var msg = {};
+  var friends = {};
 
   $("#sendBT").click(function() {
-    var msg = {};
-    msg.text = $("#toSend").val();
+    msg.text = $("#toSend").val() || "";
     if(username === null) {
       alert('please enter username');
     }
@@ -19,17 +20,41 @@ $(function(){
   });
 
   $("#usernameBT").click(function() {
-    //console.log();
     username = $("#username").val();
     $("#username").text = username;
   });
 
-  $("#refreshMsgs").click(function() {
-    getMsg();
-    console.log(stringHtml);
-  
+  $("#roomnameBT").click(function() {
+    var newRoom = $("#roomname").val();
+    username = $("#username").val();
+    if(username === "" || newRoom === null) {
+      alert('please enter username and roomname');
+    }else {
+      if(rooms[newRoom] === undefined) {
+        rooms[newRoom] = true;
+        $("#roomSelect").append("<option selected>" +newRoom+ "</option>")
+      }
+      msg.text = $("#toSend").val() || "";
+      msg.username = username;
+      msg.roomname = newRoom;
+      msg.friend = "yea";
+      postMsg(msg);
+    }
   });
 
+  $("#refreshMsgs").click(function() {
+    getMsg();
+  });
+
+  var handleUserClicks = function(e) {
+    var friend = $(e.target).data("name");
+    if(friends[username] === undefined) {
+      friends[username] = [];
+    }
+    friends[username].push(friend);
+  };
+
+  $(document).on("click",".chatUsername", handleUserClicks);
 
   var postMsg = function(message){
     
@@ -40,10 +65,10 @@ $(function(){
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        console.log('chatterbox: Message sent');
+        // console.log('chatterbox: Message sent');
       },
       error: function (data) {
-        console.log(data);
+        // console.log(data);
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
         console.error('chatterbox: Failed to send message');
       }
@@ -58,10 +83,10 @@ $(function(){
       contentType: 'application/json',
       data: {order: '-createdAt'},
       success: function (data) {
-    //    console.log(data);
+       console.log(data);
         parseMsg(data);
         getRooms(data);
-        console.log('chatterbox: Message received');
+        //console.log('chatterbox: Message received');
       },
       error: function (data) {
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -70,16 +95,21 @@ $(function(){
     });
   };
 
-  var parseMsg = function(data, room){
+  var parseMsg = function(data){
     stringHtml = "";
     selectedRoom = $("#roomSelect").val();
-    console.log("selectedRoom: " + selectedRoom);
-    room = selectedRoom;
     for (var i = 0; i < data.results.length; i++) {
+      var textFormat = "";
       if(!isScript(data.results[i].text) && !isScript(data.results[i].username) && !isScript(data.results[i].roomname)){
-        if(data.results[i].roomname === room) {
+        if(data.results[i].roomname === selectedRoom) {
           var timestamp = $.prettyDate.format(data.results[i].createdAt);
-          stringHtml = stringHtml.concat("<p>"+data.results[i].username+": "+data.results[i].text+" @" +timestamp+ " room: " + data.results[i].roomname + "</p>");
+          if(friends[username] !== undefined && friends[username].indexOf(data.results[i].username) !== -1) {
+            textFormat = "<b>" + data.results[i].username + "</b>";
+          }
+          else {
+            textFormat = data.results[i].username;
+          }
+          stringHtml = stringHtml.concat("<p><a class='chatUsername' href='#' data-name='"+data.results[i].username+"'>"+textFormat+"</a>: "+data.results[i].text+" @" +timestamp+ " room: " + data.results[i].roomname + "</p>");
         }
       }
     };
